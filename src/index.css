@@ -12,7 +12,7 @@ body {
 * {
   font-family: 'Lato', sans-serif;
   letter-spacing: -0.01em;
-  font-size: 10px; /* <-- Change this value to adjust global font size */
+  font-size: 18px; /* <-- Change this value to adjust global font size */
 }
 
 /* Ensure no default margins interfere */

@@ -24,7 +24,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // General app error state, if needed
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Changed to true
   const [settings, setSettings] = useState<AppSettings>({
     theme: 'dark',
     apiUrl: API_URL,
@@ -118,14 +118,14 @@ const App: React.FC = () => {
   }, []); // Empty dependency array means this function is created once
 
   return (
-    <div className="h-screen flex overflow-x-hidden">
+    <div className="h-screen flex overflow-hidden relative">
       {/* Main content wrapper */}
-      <div className={`flex-1 flex flex-col min-w-0 transform transition-all duration-300 ease-in-out
+      <div className={`flex-1 flex flex-col min-w-0 transform transition-all duration-300 ease-in-out relative
         ${!sidebarCollapsed ? 'translate-x-64' : 'translate-x-0'}
         ${settings.theme === 'dark' ? 'text-gray-100 bg-[#0A0A0A]' : 'text-gray-900 bg-white'}`}>
         
-        {/* Fixed header */}
-        <header className={`transition-all duration-300 ease-in-out shadow-sm flex items-center px-4 h-16 sticky top-0
+        {/* Fixed header - make sure it's always clickable */}
+        <header className={`transition-all duration-300 ease-in-out shadow-sm flex items-center px-4 h-16 sticky top-0 z-30
           ${settings.theme === 'dark' ? 'bg-gray-900 border-b border-gray-800' : 'bg-white border-b border-gray-200'}`}>
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}

@@ -13,7 +13,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div
       className={`fixed inset-y-0 left-0 transform transition-all duration-300 ease-in-out w-64
-        shadow-md
+        shadow-md z-20
         ${settings.theme === 'dark' 
           ? 'bg-gray-900 border-r border-gray-800 text-gray-100' 
           : 'bg-white border-r border-gray-200 text-gray-900'}

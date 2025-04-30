@@ -6,8 +6,8 @@ import { FaPaperPlane } from 'react-icons/fa';
 const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading, theme }) => {
   const [inputValue, setInputValue] = useState('');
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  // Helper function to handle message submission logic
+  const submitMessage = () => {
     const trimmed = inputValue.trim();
     if (trimmed && !isLoading) {
       onSendMessage(trimmed);
@@ -15,10 +15,16 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading, theme }
     }
   };
 
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    submitMessage();
+  };
+
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    // Submit on Enter press unless Shift is held
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as any);
+      submitMessage();
     }
   };
 

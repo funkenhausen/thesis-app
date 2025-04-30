@@ -4,6 +4,7 @@ import { Message } from '../types';
 import MessageBubble from './MessageBubble';
 import { MessageListProps } from '../types';
 
+
 const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme }) => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 

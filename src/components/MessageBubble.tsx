@@ -7,42 +7,48 @@ interface MessageBubbleProps {
   theme: 'dark' | 'light';
 }
 
-// Helper function to format emotions, sorted by probability
-const formatEmotions = (emotions: Record<string, number>, theme: 'dark' | 'light'): React.ReactNode => {
-  const sortedEmotions = Object.entries(emotions)
-    .sort(([, probA], [, probB]) => probB - probA); // Sort descending
-
-  const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-800';
-
-  return (
-    <div className="space-y-1 text-base">
-      {sortedEmotions.map(([emotion, probability]) => (
-        <div key={emotion} className="flex justify-between">
-          <span className={textColor}>{emotion}:</span>
-          <span className={`font-medium ${textColor}`}>
-            {`${(probability * 100).toFixed(0)}%`}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message, theme }) => {
   const isUser = message.sender === 'user';
+
+
   const bubbleClasses = isUser
-    ? 'bg-blue-700 text-white ml-auto' // User message styles
+    ? theme === 'dark'
+      ? 'bg-[#1E2228] text-[#ECECF1] ml-auto'        // user dark
+      : 'bg-[#DCF8C6] text-[#111111] ml-auto'        // user light
     : theme === 'dark'
-      ? 'bg-gray-800 text-white border border-gray-700 mr-auto' // Bot dark mode
-      : 'bg-white text-gray-900 border border-gray-200 mr-auto'; // Bot light mode
+      ? 'bg-[#444654] text-[#ECECF1] border border-[#3E3F4B] mr-auto'  // bot dark
+      : 'bg-[#E8E8E8] text-[#111111] border border-[#E5E7EB] mr-auto';  // bot light
 
   const containerClasses = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
 
+  const textClasses = theme === 'dark' ? 'text-[#ECECF1]' : 'text-[#111111]';
+
+  const secondaryTextClasses = theme === 'dark' ? 'text-[#A1A1AA]' : 'text-[#52525B]';
+
   return (
     <div className={containerClasses}>
-      <div className={`p-3 rounded-lg max-w-md md:max-w-lg shadow-md transition-colors duration-300 ${bubbleClasses}`}>
-        {isUser && message.text && <p>{message.text}</p>}
-        {message.sender === 'bot' && message.emotions && formatEmotions(message.emotions, theme)}
+      <div
+        className={`p-3 rounded-lg max-w-md md:max-w-lg shadow-md transition-colors duration-300 ${bubbleClasses}`}
+      >
+        {message.text && (
+          <p className={`whitespace-pre-wrap ${textClasses}`}>{message.text}</p>
+        )}
+
+        {message.sender === 'bot' && message.emotions && (
+          <div className="mt-2 space-y-1 text-base">
+            {Object.entries(message.emotions)
+              .sort(([, a], [, b]) => b - a)
+              .map(([emotion, probability]) => (
+                <div key={emotion} className="flex justify-between">
+                  <span className={secondaryTextClasses}>{emotion}:</span>
+                  <span className={`font-medium ${textClasses}`}>
+                    {(probability * 100).toFixed(0)}%
+                  </span>
+                </div>
+              ))}
+          </div>
+        )}
+
         {message.sender === 'bot' && message.error && (
           <p className="text-red-400 text-sm">Error: {message.error}</p>
         )}

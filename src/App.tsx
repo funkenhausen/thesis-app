@@ -5,6 +5,7 @@ import MessageList from './components/MessageList';
 import InputArea from './components/InputArea';
 import Sidebar from './components/Sidebar';
 import SettingsModal from './components/SettingsModal';
+import ChatContextMenu from './components/ChatContextMenu';
 import { FiMenu, FiX } from 'react-icons/fi';
 
 // --- Default Configuration ---
@@ -72,6 +73,11 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [isSettingsOpen, setSettingsOpen] = useState<boolean>(false);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    chatId: string;
+  } | null>(null);
 
 
   // --- Effects --- (Keep existing useEffect hooks)
@@ -210,12 +216,60 @@ const App: React.FC = () => {
     setSettings(newSettings);
   }, []);
 
+  const handleContextMenu = useCallback((e: React.MouseEvent, chatId: string) => {
+    e.preventDefault();
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      chatId,
+    });
+  }, []);
+
+  const handleRenameChat = useCallback(() => {
+    if (!contextMenu) return;
+    
+    const chatToRename = chatHistory.find(chat => chat.id === contextMenu.chatId);
+    if (!chatToRename) return;
+    
+    const newTitle = prompt('Enter new chat name:', chatToRename.title);
+    if (newTitle) {
+      setChatHistory(prev => prev.map(chat => 
+        chat.id === contextMenu.chatId 
+          ? { ...chat, title: newTitle }
+          : chat
+      ));
+    }
+    setContextMenu(null);
+  }, [contextMenu, chatHistory]);
+
+  const handleDeleteChat = useCallback(() => {
+    if (!contextMenu) return;
+    
+    if (window.confirm('Are you sure you want to delete this chat?')) {
+      setChatHistory(prev => prev.filter(chat => chat.id !== contextMenu.chatId));
+      if (currentChatId === contextMenu.chatId) {
+        const remainingChats = chatHistory.filter(chat => chat.id !== contextMenu.chatId);
+        if (remainingChats.length > 0) {
+          setCurrentChatId(remainingChats[0].id);
+        } else {
+          startNewChat();
+        }
+      }
+    }
+    setContextMenu(null);
+  }, [contextMenu, currentChatId, chatHistory, startNewChat]);
+
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
 
   // --- Render --- (Keep existing render structure)
   return (
     <div className={`h-screen flex overflow-hidden ${settings.theme}`}>
-
-       <Sidebar
+      <Sidebar
           isOpen={sidebarOpen}
           onOpenSettings={() => setSettingsOpen(true)}
           // Sort chat history by timestamp for display in sidebar
@@ -224,7 +278,19 @@ const App: React.FC = () => {
           onStartNewChat={startNewChat}
           currentChatId={currentChatId}
           onSelectChat={handleSelectChat}
+          onContextMenu={handleContextMenu}
         />
+
+      {/* Add context menu */}
+      {contextMenu && (
+        <ChatContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onRename={handleRenameChat}
+          onDelete={handleDeleteChat}
+          theme={settings.theme}
+        />
+      )}
 
       {/* Main chat area */}
        <div

@@ -14,6 +14,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   onStartNewChat,
   currentChatId,
   onSelectChat,
+  onContextMenu, // Added onContextMenu prop
+  
 }) => {
   return (
     <div
@@ -67,9 +69,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
             {chatHistory.map((chat) => (
               <li key={chat.id}>
-                <button
-                  type="button"
+                <div
                   onClick={() => onSelectChat(chat.id)}
+                  onContextMenu={(e) => onContextMenu(e, chat.id)} // Added onContextMenu handler
                   // Apply selected styles based on currentChatId
                   className={`w-full text-left p-2.5 rounded-lg flex items-center gap-3 focus:outline-none focus:ring-1 focus:ring-inset transition-colors duration-150
                     ${currentChatId === chat.id
@@ -86,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       {chat.lastMessage || '...'} {/* Fallback last message */}
                     </p>
                   </div>
-                </button>
+                </div>
               </li>
             ))}
           </ul>

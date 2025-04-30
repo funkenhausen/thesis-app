@@ -1,33 +1,28 @@
 // src/types.ts
 
 export type EmotionData = {
-    [key: string]: number; // e.g., { "Happiness": 0.95, "Sadness": 0.12 }
-  };
-  
-  export interface Message {
-    id: string; // Unique ID for React key prop
-    sender: 'user' | 'bot';
-    text?: string; // User's input text
-    emotions?: EmotionData; // Bot's emotion analysis
-    timestamp: number; // For potential ordering or display
-    error?: string; // Optional error message for bot response
-  }
-  
-  export interface EmotionApiResponse {
-      emotions: EmotionData;
-  }
-  
-  // Or if the API might return an error structure:
-  export interface EmotionApiErrorResponse {
-      error: string;
-  }
+  [key: string]: number; // e.g., { "Happiness": 0.95, "Sadness": 0.12 }
+};
 
-export interface ChatHistoryItem {
-  id: string;
-  title: string;
-  lastMessage: string;
-  timestamp: number;
+export interface Message {
+  id: string; // Unique ID for React key prop
+  sender: 'user' | 'bot';
+  text?: string; // User's input text
+  emotions?: EmotionData; // Bot's emotion analysis
+  timestamp: number; // For potential ordering or display
+  error?: string; // Optional error message for bot response
 }
+
+export interface EmotionApiResponse {
+  emotions: EmotionData;
+}
+
+// Or if the API might return an error structure:
+export interface EmotionApiErrorResponse {
+  error: string;
+}
+
+export type ChatHistoryItem = Chat;
 
 export interface AppSettings {
   theme: 'dark' | 'light';
@@ -40,9 +35,9 @@ export interface SidebarProps {
   isCollapsed: boolean;
   onClose: () => void;
   onToggleCollapse: () => void;
+  onOpenSettings: () => void;         // Trigger settings modal
   chatHistory: ChatHistoryItem[];
-  settings: AppSettings;
-  onSettingsChange: (settings: AppSettings) => void;
+  theme: 'dark' | 'light';            // Pass theme separately
 }
 
 export interface MessageListProps {
@@ -55,4 +50,12 @@ export interface InputAreaProps {
   onSendMessage: (text: string) => Promise<void>;
   isLoading: boolean;
   theme: 'dark' | 'light';
+}
+
+export interface Chat {
+  id: string;
+  title: string;
+  messages: Message[];
+  lastMessage: string;
+  timestamp?: number;
 }

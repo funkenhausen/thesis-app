@@ -1,5 +1,7 @@
+// src/components/Sidebar.tsx
 import React from 'react';
-import { ChatHistoryItem, AppSettings, SidebarProps } from '../types';
+import { ChatHistoryItem, SidebarProps } from '../types';
+import { FiChevronLeft, FiChevronRight, FiSettings, FiClock } from 'react-icons/fi';
 
 const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
@@ -7,98 +9,70 @@ const Sidebar: React.FC<SidebarProps> = ({
   onClose,
   onToggleCollapse,
   chatHistory,
-  settings,
-  onSettingsChange,
+  onOpenSettings,
+  theme,
 }) => {
   return (
     <div
-      className={`fixed inset-y-0 left-0 transform transition-all duration-300 ease-in-out w-64
-        shadow-md z-20
-        ${settings.theme === 'dark' 
-          ? 'bg-gray-900 border-r border-gray-800 text-gray-100' 
-          : 'bg-white border-r border-gray-200 text-gray-900'}
+      className={`fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out w-64 z-20 flex flex-col
+        ${theme === 'dark'
+          ? 'bg-[#202123] border-r border-[#3E3F4B] text-[#ECECF1]'
+          : 'bg-[#F7F7F8] border-r border-[#E5E7EB] text-[#111111]'}
         ${!isOpen ? '-translate-x-full' : 'translate-x-0'}`}
-      style={{ 
-        willChange: 'transform'
-      }}
+      style={{ willChange: 'transform' }}
     >
       {/* Header */}
-      <div className={`h-16 border-b transition-colors duration-300 ${settings.theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
-        <div className="h-full px-4 flex items-center">
-          <h2 className={`text-xl font-bold ${settings.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-            Menu
-          </h2>
+      <div className={`h-16 flex items-center justify-between px-4 border-b transition-colors duration-300
+        ${theme === 'dark' ? 'border-[#3E3F4B]' : 'border-[#E5E7EB]'}`}
+      >
+        <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-[#ECECF1]' : 'text-[#111111]'}`}>Menu</h2>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label="Toggle collapse"
+            className="focus:outline-none"
+          >
+            {isCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
+          </button>
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            aria-label="Open settings"
+            className="focus:outline-none"
+          >
+            <FiSettings size={20} />
+          </button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
-        {!isCollapsed && (
-          <>
-            {/* Chat History Section */}
-            <div className="p-4">
-              <h3 className={`text-sm font-semibold uppercase ${settings.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                Recent Chats
-              </h3>
-              <div className="mt-2 space-y-2">
-                {chatHistory.map((chat) => (
-                  <div
-                    key={chat.id}
-                    className={`p-2 rounded cursor-pointer ${
-                      settings.theme === 'dark' 
-                        ? 'hover:bg-gray-800 text-gray-200' 
-                        : 'hover:bg-gray-100 text-gray-900'
-                    }`}
-                  >
-                    <div className="text-sm font-medium">{chat.title}</div>
-                    <div className={`text-xs ${settings.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} truncate`}>
-                      {chat.lastMessage}
-                    </div>
+      {/* Chat History */}
+      <div className={`flex-1 overflow-y-auto transition-opacity duration-300
+        ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
+      >
+        <div className="p-4">
+          <h3 className={`text-xs font-medium uppercase mb-2 ${theme === 'dark' ? 'text-[#A1A1AA]' : 'text-[#52525B]'}`}>Recent Chats</h3>
+          <ul className="space-y-1">
+            {chatHistory.map((chat: ChatHistoryItem) => (
+              <li key={chat.id}>
+                <button
+                  type="button"
+                  className={`w-full text-left p-2 rounded-lg flex items-center gap-2 transition-colors duration-200
+                    ${theme === 'dark'
+                      ? 'hover:bg-[#343541]'
+                      : 'hover:bg-[#FFFFFF]'}
+                  `}
+                >
+                  <FiClock size={16} className={theme === 'dark' ? 'text-[#A1A1AA]' : 'text-[#52525B]'} />
+                  <div className="flex flex-col truncate">
+                    <span className={`text-sm font-medium truncate ${theme === 'dark' ? 'text-[#ECECF1]' : 'text-[#111111]'}`}>{chat.title}</span>
+                    <span className={`text-xs truncate ${theme === 'dark' ? 'text-[#A1A1AA]' : 'text-[#52525B]'}`}>{chat.lastMessage}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Settings Section */}
-            <div className={`p-4 border-t ${settings.theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
-              <h3 className={`text-sm font-semibold uppercase ${settings.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                Settings
-              </h3>
-              <div className="mt-2 space-y-3">
-                {/* Theme selector */}
-                <div className="flex items-center justify-between">
-                  <span className={settings.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Theme</span>
-                  <select
-                    value={settings.theme}
-                    onChange={(e) => onSettingsChange({ ...settings, theme: e.target.value as 'dark' | 'light' })}
-                    className={`rounded border text-sm px-2 py-1 shadow-none ${
-                      settings.theme === 'dark'
-                        ? 'bg-gray-800 border-gray-700 text-gray-100'
-                        : 'bg-white border-gray-300 text-gray-900'
-                    }`}
-                  >
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                  </select>
-                </div>
-                {/* API URL input */}
-                <div className="flex items-center justify-between">
-                  <span className={settings.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>API URL</span>
-                  <input
-                    type="text"
-                    value={settings.apiUrl}
-                    onChange={(e) => onSettingsChange({ ...settings, apiUrl: e.target.value })}
-                    className={`rounded border px-2 py-1 text-sm w-36 ${
-                      settings.theme === 'dark'
-                        ? 'bg-gray-800 border-gray-700 text-gray-100'
-                        : 'bg-white border-gray-300 text-gray-900'
-                    }`}
-                  />
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

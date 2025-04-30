@@ -45,6 +45,7 @@ export interface SidebarProps {
   onStartNewChat: () => void;         // Callback to start a new chat
   currentChatId: string;              // ID of the currently active chat
   onSelectChat: (chatId: string) => void; // Callback when a chat is selected
+  onContextMenu: (e: React.MouseEvent, chatId: string) => void;
 }
 
 export interface MessageListProps {

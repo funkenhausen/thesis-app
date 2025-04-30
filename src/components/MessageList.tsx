@@ -11,21 +11,32 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(scrollToBottom, [messages]); // Scroll when messages change
+  useEffect(scrollToBottom, [messages]);
 
   return (
-    <div className="flex-grow overflow-y-auto p-4 space-y-4 scroll-smooth">
+    <div
+      className={`
+        flex-grow overflow-y-auto p-4 space-y-4 scroll-smooth
+        ${theme === 'dark' ? 'bg-[#202123]' : 'bg-[#F7F7F8]'}
+      `}
+    >
       {messages.map((msg) => (
         <MessageBubble key={msg.id} message={msg} theme={theme} />
       ))}
       {isLoading && (
         <div className="flex justify-start">
-           <div className="p-3 rounded-lg max-w-md md:max-w-lg shadow-md bg-gray-700 text-gray-400 italic">
-             Thinking...
-           </div>
+                  <div
+                    className={`
+                      p-3 rounded-lg max-w-md md:max-w-lg shadow-md italic
+                      ${theme === 'dark'
+                        ? 'bg-[#444654] text-[#A1A1AA]'
+                        : 'bg-[#E8E8E8] text-[#52525B]'}
+                    `}
+                  >
+                    Thinking...
+                  </div>
         </div>
       )}
-      {/* Dummy div to help scroll to bottom */}
       <div ref={messagesEndRef} />
     </div>
   );

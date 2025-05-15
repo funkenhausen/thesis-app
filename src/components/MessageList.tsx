@@ -2,10 +2,9 @@
 import React, { useEffect, useRef } from 'react';
 import { Message } from '../types';
 import MessageBubble from './MessageBubble';
-import { MessageListProps } from '../types';
+import { MessageListProps } from '../types'; // Ensure this is imported correctly
 
-
-const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme }) => {
+const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme, showModelAnalysis }) => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -22,20 +21,25 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
       `}
     >
       {messages.map((msg) => (
-        <MessageBubble key={msg.id} message={msg} theme={theme} />
+        <MessageBubble 
+            key={msg.id} 
+            message={msg} 
+            theme={theme} 
+            showModelAnalysis={showModelAnalysis} // Pass prop
+        />
       ))}
       {isLoading && (
         <div className="flex justify-start">
-                  <div
-                    className={`
-                      p-3 rounded-lg max-w-md md:max-w-lg shadow-md italic
-                      ${theme === 'dark'
-                        ? 'bg-[#444654] text-[#A1A1AA]'
-                        : 'bg-[#E8E8E8] text-[#52525B]'}
-                    `}
-                  >
-                    Thinking...
-                  </div>
+          <div
+            className={`
+              p-3 rounded-lg max-w-md md:max-w-lg shadow-md italic
+              ${theme === 'dark'
+                ? 'bg-[#444654] text-[#A1A1AA]'
+                : 'bg-[#E8E8E8] text-[#52525B]'}
+            `}
+          >
+            Thinking...
+          </div>
         </div>
       )}
       <div ref={messagesEndRef} />

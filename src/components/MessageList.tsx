@@ -1,6 +1,5 @@
 // src/components/MessageList.tsx
 import React, { useEffect, useRef } from 'react';
-import { Message } from '../types';
 import MessageBubble from './MessageBubble';
 import { MessageListProps } from '../types'; // Ensure this is imported correctly
 

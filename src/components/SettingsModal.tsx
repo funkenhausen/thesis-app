@@ -10,6 +10,45 @@ interface SettingsModalProps {
   onSettingsChange: (newSettings: AppSettings) => void;
 }
 
+// Simple Toggle Switch Component
+const ToggleSwitch: React.FC<{
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  theme: 'dark' | 'light';
+  idSuffix?: string; // To ensure unique IDs if multiple toggles
+}> = ({ label, checked, onChange, theme, idSuffix ="" }) => {
+  const uniqueId = `${label.replace(/\s+/g, '-').toLowerCase()}${idSuffix}`;
+  const handleToggle = () => {
+    onChange(!checked);
+  };
+
+  return (
+    <div className="flex items-center justify-between py-2">
+      <label htmlFor={uniqueId} className="block font-medium text-sm">
+        {label}
+      </label>
+      <button
+        id={uniqueId}
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={handleToggle}
+        className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 
+          ${checked ? 'bg-[#10A37F]' : (theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200')}
+          ${theme === 'dark' ? 'focus:ring-offset-[#343541]' : 'focus:ring-offset-white'}
+          focus:ring-[#10A37F]`}
+      >
+        <span
+          className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform 
+            ${checked ? 'translate-x-6' : 'translate-x-1'}`}
+        />
+      </button>
+    </div>
+  );
+};
+
+
 const SettingsModal: FC<SettingsModalProps> = ({
   isOpen,
   onClose,
@@ -19,27 +58,23 @@ const SettingsModal: FC<SettingsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"> {/* Increased z-index */}
-      {/* backdrop */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" // Enhanced backdrop
+        className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
-
-      {/* modal box */}
       <div
         className={`relative z-50 w-full max-w-md p-6 rounded-xl shadow-2xl transition-colors duration-300
           ${settings.theme === 'dark'
             ? 'bg-[#343541] text-[#ECECF1]'
             : 'bg-[#FFFFFF] text-[#111111]'}`}
-        role="dialog" // Accessibility roles
+        role="dialog"
         aria-modal="true"
         aria-labelledby="settings-title"
       >
-        {/* header */}
-        <div className="flex items-center justify-between mb-6"> {/* Increased margin */}
-          <h2 id="settings-title" className="text-xl font-semibold">Settings</h2> {/* Increased size */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 id="settings-title" className="text-xl font-semibold">Settings</h2>
           <button
             type="button"
             onClick={onClose}
@@ -47,13 +82,12 @@ const SettingsModal: FC<SettingsModalProps> = ({
             className={`p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2
               ${settings.theme === 'dark' ? 'text-gray-400 hover:text-white focus:ring-[#10A37F] focus:ring-offset-[#343541]' : 'text-gray-500 hover:text-black focus:ring-[#10A37F] focus:ring-offset-white'}`}
           >
-            <FiX size={24} /> {/* Increased icon size */}
+            <FiX size={24} />
           </button>
         </div>
 
-        {/* theme selector */}
-        <div className="mb-5"> {/* Consistent margin */}
-          <label htmlFor="theme-select" className="block mb-2 font-medium text-sm">Theme</label> {/* Adjusted label */}
+        <div className="mb-5">
+          <label htmlFor="theme-select" className="block mb-2 font-medium text-sm">Theme</label>
           <select
             id="theme-select"
             value={settings.theme}
@@ -70,9 +104,8 @@ const SettingsModal: FC<SettingsModalProps> = ({
           </select>
         </div>
 
-        {/* API URL */}
-        <div className="mb-6"> {/* Consistent margin */}
-          <label htmlFor="api-url-input" className="block mb-2 font-medium text-sm">API URL</label> {/* Adjusted label */}
+        <div className="mb-6">
+          <label htmlFor="api-url-input" className="block mb-2 font-medium text-sm">API URL</label>
           <input
             id="api-url-input"
             type="text"
@@ -80,7 +113,7 @@ const SettingsModal: FC<SettingsModalProps> = ({
             onChange={e =>
               onSettingsChange({ ...settings, apiUrl: e.target.value })
             }
-            placeholder="http://localhost:5000/predict" // Added placeholder
+            placeholder="http://localhost:5000/predict"
             className={`w-full rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-[#10A37F] transition-colors duration-200
               ${settings.theme === 'dark'
                 ? 'bg-[#202123] border-[#3E3F4B] text-[#ECECF1]'
@@ -88,7 +121,19 @@ const SettingsModal: FC<SettingsModalProps> = ({
           />
         </div>
 
-        {/* close button */}
+        {/* Show Model Analysis Toggle */}
+        <div className="mb-6">
+          <ToggleSwitch
+            label="Show Model Analysis"
+            checked={settings.showModelAnalysis}
+            onChange={(isChecked) => 
+              onSettingsChange({ ...settings, showModelAnalysis: isChecked })
+            }
+            theme={settings.theme}
+            idSuffix="-model-analysis" // Added for unique ID
+          />
+        </div>
+
         <div className="text-right">
           <button
             type="button"

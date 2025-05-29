@@ -9,8 +9,9 @@ import ChatContextMenu from './components/ChatContextMenu';
 import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
 
 // --- Default Configuration ---
-const ENV_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const DEFAULT_API_URL = ENV_API_BASE_URL ? `${ENV_API_BASE_URL}/predict` : 'http://127.0.0.1:5001/predict';
+// const ENV_API_BASE_URL = import.meta.env.VITE_API_BASE_URL; // No longer needed
+// const DEFAULT_API_URL = ENV_API_BASE_URL ? `${ENV_API_BASE_URL}/predict` : 'http://127.0.0.1:5001/predict';
+const DEFAULT_API_URL = '/api/predict'; // USING VITE PROXY - this path will be proxied
 const DEFAULT_MODEL_TYPE = 'bert';
 const DEFAULT_SHOW_MODEL_ANALYSIS = true;
 const DEFAULT_INITIAL_MESSAGE: Message = {

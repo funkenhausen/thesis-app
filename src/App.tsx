@@ -9,7 +9,10 @@ import ChatContextMenu from './components/ChatContextMenu';
 import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
 
 // --- Default Configuration ---
-const DEFAULT_API_URL = 'http://127.0.0.1:5001/predict';
+const ENV_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const DEFAULT_API_URL = ENV_API_BASE_URL ? `${ENV_API_BASE_URL}/predict` : 'http://127.0.0.1:5001/predict';
+console.log("VITE_API_BASE_URL:", ENV_API_BASE_URL);
+console.log("DEFAULT_API_URL for app:", DEFAULT_API_URL);
 const DEFAULT_MODEL_TYPE = 'bert';
 const DEFAULT_SHOW_MODEL_ANALYSIS = true; // Default for showing analysis
 const DEFAULT_INITIAL_MESSAGE: Message = {
@@ -53,7 +56,7 @@ const App: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<ModelType>(settings.modelType);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState<boolean>(false);
   const modelSelectorRef = useRef<HTMLDivElement>(null);
-
+  
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>(() => {
     const savedHistory = localStorage.getItem('emotionChatHistory');
     if (savedHistory) {

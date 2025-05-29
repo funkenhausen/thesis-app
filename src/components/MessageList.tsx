@@ -1,7 +1,7 @@
 // src/components/MessageList.tsx
 import React, { useEffect, useRef } from 'react';
 import MessageBubble from './MessageBubble';
-import { MessageListProps } from '../types'; // Ensure this is imported correctly
+import { MessageListProps } from '../types';
 
 const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme, showModelAnalysis }) => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
@@ -15,23 +15,23 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme, s
   return (
     <div
       className={`
-        flex-grow overflow-y-auto p-4 space-y-4 scroll-smooth
+        flex-grow overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 scroll-smooth
         ${theme === 'dark' ? 'bg-[#202123]' : 'bg-[#F7F7F8]'}
       `}
     >
       {messages.map((msg) => (
-        <MessageBubble 
-            key={msg.id} 
-            message={msg} 
-            theme={theme} 
-            showModelAnalysis={showModelAnalysis} // Pass prop
+        <MessageBubble
+            key={msg.id}
+            message={msg}
+            theme={theme}
+            showModelAnalysis={showModelAnalysis}
         />
       ))}
       {isLoading && (
         <div className="flex justify-start">
           <div
             className={`
-              p-3 rounded-lg max-w-md md:max-w-lg shadow-md italic
+              p-2.5 sm:p-3 rounded-lg max-w-[75%] sm:max-w-md md:max-w-lg shadow-md italic text-sm sm:text-base
               ${theme === 'dark'
                 ? 'bg-[#444654] text-[#A1A1AA]'
                 : 'bg-[#E8E8E8] text-[#52525B]'}

@@ -6,7 +6,6 @@ import { FaPaperPlane } from 'react-icons/fa';
 const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading, theme }) => {
   const [inputValue, setInputValue] = useState('');
 
-  // Helper function to handle message submission logic
   const submitMessage = () => {
     const trimmed = inputValue.trim();
     if (trimmed && !isLoading) {
@@ -21,7 +20,6 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading, theme }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Submit on Enter press unless Shift is held
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       submitMessage();
@@ -32,7 +30,7 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading, theme }
     <form
       onSubmit={handleSubmit}
       className={`
-        w-full flex items-end gap-2 px-4 py-3 border-t
+        w-full flex items-end gap-1.5 sm:gap-2 px-2.5 py-2 sm:px-4 sm:py-3 border-t
         ${theme === 'dark' ? 'bg-[#343541] border-[#3E3F4B]' : 'bg-[#FFFFFF] border-[#E5E7EB]'}
       `}
     >
@@ -44,7 +42,8 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading, theme }
         disabled={isLoading}
         rows={1}
         className={`
-          flex-grow resize-none overflow-auto max-h-40 min-h-[2.5rem] rounded-lg px-4 py-2
+          flex-grow resize-none overflow-auto max-h-32 sm:max-h-40 min-h-[2.25rem] sm:min-h-[2.5rem] 
+          rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base
           focus:outline-none focus:ring-2 transition-all duration-200
           ${theme === 'dark'
             ? 'bg-[#202123] text-[#ECECF1] placeholder-[#A1A1AA] border border-[#3E3F4B] focus:ring-[#10A37F]'
@@ -58,7 +57,7 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading, theme }
         disabled={isLoading || inputValue.trim().length === 0}
         aria-label="Send message"
         className={`
-          p-2 rounded-full transition-colors duration-200 flex items-center justify-center
+          p-1.5 sm:p-2 rounded-full transition-colors duration-200 flex items-center justify-center
           ${isLoading || inputValue.trim().length === 0
             ? 'opacity-50 cursor-not-allowed'
             : theme === 'dark'
@@ -66,7 +65,7 @@ const InputArea: React.FC<InputAreaProps> = ({ onSendMessage, isLoading, theme }
               : 'bg-[#10A37F] hover:bg-[#0E8C6E]'}
         `}
       >
-        <FaPaperPlane className="w-5 h-5 text-white rotate-90" />
+        <FaPaperPlane className="w-4 h-4 sm:w-5 sm:h-5 text-white rotate-90" />
       </button>
     </form>
   );

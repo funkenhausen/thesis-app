@@ -1,11 +1,11 @@
 // src/components/MessageBubble.tsx
 import React from 'react';
-import { Message } from '../types'; 
+import { Message } from '../types';
 
 interface MessageBubbleProps {
   message: Message;
   theme: 'dark' | 'light';
-  showModelAnalysis: boolean; // Added prop
+  showModelAnalysis: boolean;
 }
 
 const formatTimestamp = (timestamp: number) => {
@@ -16,6 +16,7 @@ const renderTokenHighlights = (
     tokensWithScores: { token: string; score: number }[] | undefined,
     theme: 'dark' | 'light'
 ) => {
+    // ... (no change from previous version)
     if (!tokensWithScores || tokensWithScores.length === 0) return null;
     const scores = tokensWithScores.map(ts => ts.score);
     const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
@@ -23,13 +24,13 @@ const renderTokenHighlights = (
     const minScore = Math.min(...validScores, 0);
     const maxScore = Math.max(...validScores, 0.0001);
     const getOpacity = (score: number) => {
-        if (typeof score !== 'number' || isNaN(score)) return 0.2; 
+        if (typeof score !== 'number' || isNaN(score)) return 0.2;
         if (maxScore === minScore) return 0.5;
         const normalized = (score - minScore) / (maxScore - minScore);
-        return Math.max(0.1, normalized * 0.8 + 0.2);
+        return Math.max(0.15, normalized * 0.75 + 0.25);
     };
      return (
-        <div className="flex flex-wrap gap-x-1 gap-y-0.5 leading-snug">
+        <div className="flex flex-wrap gap-x-1 gap-y-0.5 leading-snug pt-1">
             {tokensWithScores.map((ts, idx) => (
                 <span
                     key={`${ts.token}-${idx}`}
@@ -37,10 +38,10 @@ const renderTokenHighlights = (
                         backgroundColor: `rgba(16, 163, 127, ${getOpacity(ts.score)})`,
                         padding: '1px 3px',
                         borderRadius: '3px',
-                        color: getOpacity(ts.score) > 0.6 ? 'white' : (theme === 'dark' ? '#E0E0E0' : '#111111'),
-                        fontSize: '0.8rem',
+                        color: getOpacity(ts.score) > 0.65 ? 'white' : (theme === 'dark' ? '#E0E0E0' : '#111111'),
+                        fontSize: '0.75rem',
                     }}
-                    title={`Importance: ${typeof ts.score === 'number' ? ts.score.toFixed(4) : 'N/A'} (contributing to overall prediction)`}
+                    title={`Importance: ${typeof ts.score === 'number' ? ts.score.toFixed(4) : 'N/A'}`}
                 >
                     {ts.token.replace(/##/g, '')}
                 </span>
@@ -54,76 +55,77 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, theme, showModel
   const isUser = message.sender === 'user';
 
   const commonBubbleStyling = `
-    p-3 rounded-lg shadow-md transition-colors duration-300 
-    w-fit /* Allows bubble to shrink to content size, respecting min/max widths */
-    
-    /* --- Responsive Width Control --- */
-    /* Default (mobile-first) sizing: applied on all screens unless overridden by a breakpoint */
-    min-w-md    /* A small minimum width for very narrow screens or very short content */
-    max-w-lg     /* Max width is 90% of parent on small screens, prevents overflow */
+    p-2.5 sm:p-3 rounded-xl shadow-md transition-colors duration-300
+    w-fit /* Still useful, but max-width will be the primary constraint */
+    min-w-[50px]
 
-    /* sm breakpoint (typically 640px) and up: override for more uniform desktop chatbox appearance */
-    md:min-w-[80px]     /* On 'sm' screens and larger, min-width becomes 24rem (384px) as per your snippet */
-    md:max-w-md         /* On 'sm' screens and larger, max-width becomes 28rem (448px) as per your snippet */
-    /* --- End Responsive Width Control --- */
+    /* --- IMPORTANT: Mobile-first max-width and overflow handling --- */
+    max-w-[calc(100%-2rem)] /* On very small screens, leave 1rem margin on each side of the MessageList's padding */
+    overflow-hidden /* Prevent content from visually spilling out */
+    /* --- End mobile-first max-width --- */
     
-    min-h-[40px]    /* Ensure bubble has some size even if empty initially */
-    max-h-[1000px]   /* Max height for the ENTIRE bubble, allows more vertical content */
-    flex flex-col   /* Key for layout: content + timestamp at bottom */
-    /* overflow-y-auto is handled by the inner content div, not the bubble itself */
+    sm:max-w-[80%] /* Max width as a percentage for slightly larger small screens */
+    
+    md:min-w-[80px]
+    md:max-w-md /* Fixed max width for medium screens and up */
+    
+    min-h-[36px] sm:min-h-[40px]
+    flex flex-col
   `;
+
   let senderSpecificClasses = '';
   if (isUser) {
     senderSpecificClasses = theme === 'dark'
       ? 'bg-[#1E2228] text-[#ECECF1] ml-auto'
       : 'bg-[#DCF8C6] text-[#111111] ml-auto';
-  } else { 
+  } else {
     senderSpecificClasses = theme === 'dark'
       ? 'bg-[#444654] text-[#ECECF1] border border-[#3E3F4B] mr-auto'
       : 'bg-[#E8E8E8] text-[#111111] border border-[#E5E7EB] mr-auto';
   }
   const finalBubbleClasses = `${commonBubbleStyling} ${senderSpecificClasses}`;
-  const containerClasses = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+  const containerClasses = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`; // Add w-full to container to help constrain bubble
   const textClasses = theme === 'dark' ? 'text-[#ECECF1]' : 'text-[#111111]';
   const secondaryTextClasses = theme === 'dark' ? 'text-[#A1A1AA]' : 'text-[#52525B]';
-  const timestampClasses = `text-xs mt-auto pt-1 ${secondaryTextClasses} ${isUser ? 'text-right' : 'text-left'}`;
+  const timestampClasses = `text-[0.65rem] sm:text-xs mt-auto pt-1 ${secondaryTextClasses} ${isUser ? 'text-right' : 'text-left'}`;
 
   const hasBertAnalysisContent = message.analysis && (
     (message.analysis.token_scores && message.analysis.token_scores.length > 0) ||
-    message.analysis.details 
+    message.analysis.details
   );
 
   let analysisLabel = "Model Analysis";
   if (message.analysis) {
-    if (message.analysis.type.startsWith('BERT')) {
-      analysisLabel = "Model Analysis (BERT)";
-    } else if (message.analysis.type.startsWith('Naive Bayes')) {
-      analysisLabel = "Model Analysis (Naive Bayes)"; // This won't show if NB analysis is removed from backend
-    }
+    if (message.analysis.type.startsWith('BERT')) analysisLabel = "BERT Analysis";
   }
 
   return (
-    <div className={containerClasses}>
+    <div className={containerClasses}> {/* Ensure this container constrains the bubble */}
       <div className={finalBubbleClasses}>
-        <div className="flex-grow min-h-0 overflow-y-auto pr-2"> 
+        {/* Inner div for content, applying word-breaking and overflow handling */}
+        <div className="flex-grow min-h-0 break-words overflow-wrap-anywhere">
             {message.text && (
-            <p className={`whitespace-pre-wrap ${textClasses} mb-1 break-words`}>{message.text}</p>
+            <p className={`whitespace-pre-wrap ${textClasses} text-sm sm:text-base mb-1`}>
+                {message.text}
+            </p>
             )}
 
             {message.sender === 'bot' && message.emotions && (
-            <div className="mt-2 space-y-1 text-base">
+            <div className="mt-1.5 sm:mt-2 space-y-0.5 sm:space-y-1 text-sm sm:text-base">
                 {Object.entries(message.emotions)
                 .sort(([, a], [, b]) => b - a)
+                .slice(0, 7)
                 .map(([emotion, probability]) => (
-                    <div key={emotion} className="flex justify-between items-center gap-2">
-                    <span className={`${secondaryTextClasses} text-sm capitalize w-20 truncate`}>{emotion}</span>
-                    <div className="flex-grow h-2 bg-gray-600 rounded overflow-hidden">
+                    <div key={emotion} className="flex justify-between items-center gap-1 sm:gap-2">
+                    {/* Make emotion label take less fixed space and allow truncation or wrapping if necessary */}
+                    <span className={`${secondaryTextClasses} text-xs sm:text-sm capitalize shrink min-w-0 truncate pr-1`}>{emotion}</span>
+                    <div className={`flex-grow h-1.5 sm:h-2 rounded overflow-hidden ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
                         <div
                             className="h-full bg-[#10A37F]"
                             style={{ width: `${(probability * 100).toFixed(0)}%` }}
                         ></div>
                         </div>
-                    <span className={`font-medium w-10 text-right text-sm ${textClasses}`}>
+                    <span className={`font-medium w-8 sm:w-10 text-right text-xs sm:text-sm ${textClasses} flex-shrink-0`}>
                         {(probability * 100).toFixed(0)}%
                     </span>
                     </div>
@@ -131,29 +133,28 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, theme, showModel
             </div>
             )}
 
-            {/* Conditionally render analysis based on the new prop */}
             {showModelAnalysis && message.sender === 'bot' && message.analysis && message.analysis.type.startsWith('BERT') && hasBertAnalysisContent && (
-            <div className={`mt-3 pt-2 border-t text-xs ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'}`}>
-                <p className={` font-semibold mb-1 ${secondaryTextClasses}`}>{analysisLabel}:</p>
-                
+            <div className={`mt-2 sm:mt-3 pt-1.5 sm:pt-2 border-t text-xs ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
+                <p className={`font-semibold mb-0.5 sm:mb-1 text-[0.7rem] sm:text-xs ${secondaryTextClasses}`}>{analysisLabel}:</p>
+
                 {message.analysis.token_scores && message.analysis.token_scores.length > 0 && (
-                    <div className="mb-1">
-                        <p className={`${secondaryTextClasses} italic text-xs`}>Word importance (BERT attention - last layer avg.):</p>
+                    <div className="mb-0.5 sm:mb-1">
+                        <p className={`${secondaryTextClasses} italic text-[0.65rem] sm:text-xs`}>Word Importance:</p>
                         {renderTokenHighlights(message.analysis.token_scores, theme)}
                     </div>
                 )}
 
                 {message.analysis.details && (
-                <p className={`italic mt-1 ${secondaryTextClasses}`}>{message.analysis.details}</p>
+                <p className={`italic mt-0.5 sm:mt-1 text-[0.65rem] sm:text-xs ${secondaryTextClasses}`}>{message.analysis.details}</p>
                 )}
             </div>
             )}
 
             {message.sender === 'bot' && message.error && (
-            <p className="text-red-400 text-sm mt-1">Error: {message.error}</p>
+            <p className={`text-xs sm:text-sm mt-1 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{message.error}</p>
             )}
-        </div> 
-        
+        </div>
+
         <p className={timestampClasses}>
           {formatTimestamp(message.timestamp)}
         </p>
